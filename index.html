@@ -1,0 +1,269 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Equity Research & Company Research Quiz</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:#f4f6f9;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px}
+.container{width:100%;max-width:900px;background:#fff;padding:30px;border-radius:15px;box-shadow:0 5px 20px rgba(0,0,0,.1)}
+h1{text-align:center;margin-bottom:20px}
+.center{text-align:center}
+button{cursor:pointer}
+#startBtn,#nextBtn,#restartBtn{background:#2563eb;color:#fff;border:none;padding:12px 25px;border-radius:8px;font-size:16px}
+#quizContainer,#resultContainer{display:none}
+.top-bar{display:flex;justify-content:space-between;margin-bottom:20px;font-weight:bold}
+.progress{height:10px;background:#ddd;border-radius:20px;overflow:hidden;margin-bottom:20px}
+.progress-bar{height:100%;width:0%;background:#22c55e}
+.question{font-size:22px;margin-bottom:20px}
+.option{width:100%;text-align:left;margin-bottom:12px;padding:15px;border:2px solid #ddd;border-radius:8px;background:white}
+.option:hover{background:#f1f5f9}
+.correct{background:#22c55e!important;color:white;border-color:#22c55e}
+.wrong{background:#ef4444!important;color:white;border-color:#ef4444}
+.explanation{margin-top:20px;padding:15px;background:#f8fafc;border-left:4px solid #2563eb;display:none}
+.timer{color:#ef4444;font-size:20px}
+.review-item{margin-top:20px;padding:15px;border:1px solid #ddd;border-radius:10px}
+</style>
+</head>
+<body>
+<div class="container">
+<div id="startScreen" class="center">
+<h1>Equity Research & Company Research Quiz</h1>
+<p>Total Questions: 30</p><br>
+<input type="text" id="candidateName" placeholder="Enter your full name" style="width:320px;padding:12px;font-size:16px;border:1px solid #ccc;border-radius:8px;margin-bottom:15px;"><br>
+<p id="nameError" style="color:red;margin-bottom:15px;"></p>
+<button id="startBtn">START QUIZ</button>
+</div>
+
+<div id="quizContainer">
+<div class="top-bar">
+<div id="questionCount"></div>
+<div class="timer">⏳ <span id="timer">30</span>s</div>
+</div>
+<div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+<div class="question" id="questionText"></div>
+<div id="optionsContainer"></div>
+<div class="explanation" id="explanationBox"></div><br>
+<button id="nextBtn" style="display:none;">Next Question</button>
+</div>
+
+<div id="resultContainer">
+<h1>Quiz Completed 🎉</h1>
+<p><strong>Correct:</strong> <span id="correctScore"></span></p>
+<p><strong>Wrong:</strong> <span id="wrongScore"></span></p>
+<p><strong>Skipped:</strong> <span id="skippedScore"></span></p>
+<h2>Final Score: <span id="finalScore"></span>/30</h2>
+<h3>Percentage: <span id="percentage"></span>%</h3>
+<h3>Status: <span id="status"></span></h3>
+<h3>Certificate Eligibility: <span id="certificate"></span></h3>
+<h3>Time Taken: <span id="timeTaken"></span></h3><br>
+<button id="submitBtn">Submit Result</button>
+<button id="restartBtn">Restart Quiz</button>
+<p id="submitStatus" style="margin-top:15px;color:green;font-weight:bold;"></p>
+<div id="reviewSection"></div>
+</div>
+</div>
+
+<script>
+const questions = [
+{question:"What is the primary objective of Equity Research?",options:["To issue loans to companies","To evaluate stocks and provide investment recommendations","To collect taxes from investors","To regulate stock exchanges"],answer:1,explanation:"Equity Research helps investors understand whether a stock may be a good investment."},
+{question:"Who typically performs Equity Research?",options:["Research Analyst","Insurance Agent","Auditor General","Tax Consultant"],answer:0,explanation:"Research Analysts study companies and industries."},
+{question:"Equity Research mainly focuses on analyzing:",options:["Real Estate Properties","Government Policies Only","Publicly Listed Companies","Gold Prices Only"],answer:2,explanation:"It mainly studies listed companies."},
+{question:"Which is usually included in an Equity Research Report?",options:["Weather Forecast","Stock Recommendation and Target Price","Sports Scores","Income Tax Return"],answer:1,explanation:"Reports include recommendations and target prices."},
+{question:'What does a "Buy" recommendation indicate?',options:["Expected to outperform","Avoid permanently","Being delisted","Immediately double"],answer:0,explanation:"Buy suggests positive future performance."},
+{question:"Before recommending a stock, analysts study:",options:["Company Financials and Industry Trends","Attendance Records","Furniture Costs","Personal Spending"],answer:0,explanation:"Financials and industry trends are critical."},
+{question:"What is a Target Price?",options:["Historical price","Minimum quantity","Estimated future value","Face value"],answer:2,explanation:"Target price is an analyst estimate."},
+{question:"Foundation of Equity Research?",options:["Rumors","Financial Analysis, Industry Analysis, and Company Evaluation","Astrology","Weather Data"],answer:1,explanation:"Research relies on structured analysis."},
+{question:"Why is objectivity important?",options:["Recommendations based on facts","Increase volatility","Guarantee profits","Influence prices"],answer:0,explanation:"Analysts should remain unbiased."},
+{question:"How does Equity Research help investors?",options:["Eliminate risk","Provide structured analysis","Guarantee returns","Control management"],answer:1,explanation:"It supports informed decisions."},
+{question:"Primary purpose of company research?",options:["Predict lottery","Understand business and performance","Determine tax rates","Create ads"],answer:1,explanation:"Research helps understand companies."},
+{question:"Business model explains:",options:["How company earns money","Attendance policies","Office location","Meetings"],answer:0,explanation:"Business model describes revenue generation."},
+{question:"Product offered by smartphone company?",options:["Mobile phones","Interest rates","Insurance","Road construction"],answer:0,explanation:"Smartphone firms sell phones."},
+{question:"Industry refers to:",options:["Employee count","Business sector","Office size","Stock price"],answer:1,explanation:"Industry is the sector a company belongs to."},
+{question:"Example of competitive advantage?",options:["Strong brand recognition","High electricity bill","Small office","Turnover"],answer:0,explanation:"Brands help attract customers."},
+{question:"Revenue primarily comes from:",options:["Selling products/services","Paying salaries","Purchasing assets","ID cards"],answer:0,explanation:"Revenue comes from customers."},
+{question:"Market share indicates:",options:["Employee ownership","Portion of industry sales","Dividend","Offices"],answer:1,explanation:"It measures market presence."},
+{question:"Why is industry growth important?",options:["Future opportunities","Office rent","Uniforms","Taxation"],answer:0,explanation:"Growing industries create opportunities."},
+{question:"Factor strengthening competitive position?",options:["Unique technology","Utility bills","Parking","Paperwork"],answer:0,explanation:"Technology can differentiate a company."},
+{question:"Subscription company earns via:",options:["Recurring payments","Donations","Grants","Furniture"],answer:0,explanation:"Subscribers pay regularly."},
+{question:"Customer base helps assess:",options:["Demand","Building color","Attendance","Holidays"],answer:0,explanation:"Customers drive demand."},
+{question:"Indicator of growth?",options:["Increasing sales","Smaller office","Fewer customers","Reduced capacity"],answer:0,explanation:"Sales growth indicates expansion."},
+{question:"Dominant market position means:",options:["Strong influence","No competitors","No customers","Guaranteed profits"],answer:0,explanation:"Market leaders influence industries."},
+{question:"Why diversify?",options:["Reduce dependence on one revenue source","Increase rent","Reduce staff","Avoid taxes"],answer:0,explanation:"Diversification lowers risk."},
+{question:"Business risk example?",options:["Dependence on one customer","Strong brand","High satisfaction","Efficient operations"],answer:0,explanation:"Losing one customer can hurt revenue."},
+{question:"Analysts compare:",options:["Market share and strengths","Dress code","Furniture","Parking"],answer:0,explanation:"Competitive comparison matters."},
+{question:"Launching new products suggests:",options:["Growth and innovation","Cost cutting only","Exit","Downsizing"],answer:0,explanation:"Innovation supports growth."},
+{question:"International expansion may:",options:["Increase revenue opportunities","Eliminate competition","Avoid risks","Guarantee stock growth"],answer:0,explanation:"New markets create revenue."},
+{question:"Most important for long-term prospects?",options:["Sustainable competitive advantage","Building design","Parking","Celebrations"],answer:0,explanation:"Sustainable advantages last."},
+{question:"Revenue up but profits down?",options:["Investigate rising costs","Ignore decline","Focus only on stock price","Assume perfect"],answer:0,explanation:"Profit decline requires investigation."}
+];
+
+let currentQuestion=0,
+correct=0,
+wrong=0,
+skipped=0,
+timeLeft=30,
+timer,
+startTime,
+review=[],
+candidateName="",
+quizResult={};
+
+function shuffle(arr){return [...arr].sort(()=>Math.random()-0.5);}
+
+const startBtn=document.getElementById("startBtn");
+startBtn.onclick=()=>{
+const name=document.getElementById("candidateName").value.trim();
+if(name===""){
+document.getElementById("nameError").textContent="Please enter your name.";
+return;
+}
+candidateName=name;
+startTime=new Date();
+document.getElementById("startScreen").style.display="none";
+document.getElementById("quizContainer").style.display="block";
+loadQuestion();
+};
+
+function loadQuestion(){
+if(currentQuestion>=questions.length)return finishQuiz();
+clearInterval(timer);
+timeLeft=30;
+document.getElementById("timer").textContent=timeLeft;
+const q=questions[currentQuestion];
+document.getElementById("questionCount").textContent=`Question ${currentQuestion+1}/30`;
+document.getElementById("progressBar").style.width=((currentQuestion+1)/30*100)+"%";
+document.getElementById("questionText").textContent=q.question;
+document.getElementById("explanationBox").style.display="none";
+document.getElementById("nextBtn").style.display="none";
+
+const opts=q.options.map((o,i)=>({o,i}));
+shuffle(opts);
+const c=document.getElementById("optionsContainer");
+c.innerHTML="";
+opts.forEach(item=>{
+const b=document.createElement("button");
+b.className="option";
+b.textContent=item.o;
+b.onclick=()=>checkAnswer(item.i,opts);
+c.appendChild(b);
+});
+
+timer=setInterval(()=>{
+timeLeft--;
+document.getElementById("timer").textContent=timeLeft;
+if(timeLeft<=0){
+clearInterval(timer);
+skipped++;
+review.push({q:q.question,user:"Skipped",correct:q.options[q.answer],exp:q.explanation});
+currentQuestion++;
+loadQuestion();
+}
+},1000);
+}
+
+function checkAnswer(selected){
+clearInterval(timer);
+const q=questions[currentQuestion];
+document.querySelectorAll(".option").forEach(btn=>btn.disabled=true);
+const buttons=document.querySelectorAll(".option");
+
+if(selected===q.answer){correct++;} else {wrong++;}
+
+buttons.forEach(btn=>{
+if(btn.textContent===q.options[q.answer]) btn.classList.add("correct");
+});
+if(selected!==q.answer){
+buttons.forEach(btn=>{
+if(btn.textContent===q.options[selected]) btn.classList.add("wrong");
+});
+}
+
+review.push({q:q.question,user:q.options[selected],correct:q.options[q.answer],exp:q.explanation});
+document.getElementById("explanationBox").style.display="block";
+document.getElementById("explanationBox").innerHTML="<strong>Explanation:</strong><br>"+q.explanation;
+document.getElementById("nextBtn").style.display="inline-block";
+}
+
+document.getElementById("nextBtn").onclick=()=>{currentQuestion++;loadQuestion();};
+
+function finishQuiz(){
+document.getElementById("quizContainer").style.display="none";
+document.getElementById("resultContainer").style.display="block";
+document.querySelector("#resultContainer h1").innerHTML=`Quiz Completed 🎉<br><span style="font-size:20px">${candidateName}</span>`;
+const total=Math.floor((new Date()-startTime)/1000);
+const pct=(correct/30)*100;
+quizResult = {
+    name: candidateName,
+    correct: correct,
+    wrong: wrong,
+    skipped: skipped,
+    score: correct,
+    percentage: pct.toFixed(2),
+    status: pct>=50 ? "PASS" : "FAIL",
+    timeTaken: Math.floor(total/60)+" min "+(total%60)+" sec",
+    answers: review
+};
+document.getElementById("correctScore").textContent=correct;
+document.getElementById("wrongScore").textContent=wrong;
+document.getElementById("skippedScore").textContent=skipped;
+document.getElementById("finalScore").textContent=correct;
+document.getElementById("percentage").textContent=pct.toFixed(2);
+document.getElementById("status").textContent=pct>=50?"PASS ✅":"FAIL ❌";
+document.getElementById("certificate").textContent=pct>=50?"Eligible ✅":"Not Eligible ❌";
+document.getElementById("timeTaken").textContent=Math.floor(total/60)+" min "+(total%60)+" sec";
+let html="<h2 style='margin-top:20px'>Answer Review</h2>";
+review.forEach(r=>html+=`<div class='review-item'><h4>${r.q}</h4><p><b>Your Answer:</b> ${r.user}</p><p><b>Correct Answer:</b> ${r.correct}</p><p><b>Explanation:</b> ${r.exp}</p></div>`);
+document.getElementById("reviewSection").innerHTML=html;
+}
+document.getElementById("restartBtn").onclick=()=>location.reload();
+document.getElementById("submitBtn").onclick = async () => {
+
+    const status = document.getElementById("submitStatus");
+
+    status.style.color = "blue";
+    status.innerHTML = "Submitting...";
+
+    try {
+
+        const response = await fetch("/.netlify/functions/submit", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify(quizResult)
+
+        });
+
+        const result = await response.json();
+
+        if(result.success){
+
+            status.style.color="green";
+            status.innerHTML="✅ Result submitted successfully.";
+
+        }else{
+
+            status.style.color="red";
+            status.innerHTML=result.error || "Submission failed.";
+
+        }
+
+    }catch(err){
+
+        status.style.color="red";
+        status.innerHTML=err.message;
+
+        console.error(err);
+
+    }
+
+};
+</script>
+</body>
+</html>
