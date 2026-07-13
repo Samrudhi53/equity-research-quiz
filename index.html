@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Research Literacy Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#111f54;
+  --navy-deep:#0d1740;
+  --navy-2:#1E3A8A;
+  --gold:#F2A93B;
+  --gold-soft:#FCD34D;
+  --ink:#1a2030;
+  --muted:#6B7280;
+  --bg:#f3f4fb;
+  --card:#ffffff;
+  --line:#E5E7EB;
+  --blue:#2E5CD9;
+  --blue-dark:#20399B;
+  --green:#16A34A;
+  --green-bg:#DCFCE7;
+  --red:#EF4444;
+  --red-bg:#FEE2E2;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',system-ui,-apple-system,Arial,sans-serif}
+body{
+  background:var(--bg);
+  min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:24px 16px 60px;color:var(--ink);
+}
+.container{
+  width:100%;max-width:420px;background:var(--card);
+  padding:0;border-radius:22px;overflow:hidden;
+  box-shadow:0 16px 44px rgba(15,23,42,.14);
+}
+.brand-bar{
+  background:linear-gradient(160deg,var(--navy) 0%,var(--navy-deep) 100%);
+  padding:34px 28px 30px;color:#fff;position:relative;
+}
+.brand-bar .kicker{font-size:12.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:10px;color:var(--gold)}
+.brand-bar h1{font-family:'Source Serif 4',serif;font-size:26px;margin:0 0 10px;font-weight:700;letter-spacing:-.01em;line-height:1.15;text-align:left}
+.brand-bar p.sub{font-size:13.5px;color:rgba(255,255,255,.78);margin:0;line-height:1.6;max-width:280px}
+.pad{padding:24px 26px 30px}
+.center{text-align:center}
+button{cursor:pointer;transition:all .18s ease;font-family:'Inter',system-ui,sans-serif}
+
+.btn-primary{
+  width:100%;margin-top:8px;
+  background:linear-gradient(135deg,var(--blue) 0%,var(--blue-dark) 100%);
+  color:#fff;border:none;padding:15px;border-radius:12px;
+  font-size:15px;font-weight:700;letter-spacing:.2px;
+  box-shadow:0 8px 22px rgba(46,92,217,.30);
+}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 10px 26px rgba(46,92,217,.38)}
+.btn-ghost{
+  width:100%;height:46px;background:#fff;color:var(--blue);border:1.5px solid #C7D2FE;
+  border-radius:11px;font-size:13px;font-weight:700;margin-bottom:12px;
+}
+.btn-ghost:hover{border-color:var(--blue);background:#F5F7FF}
+
+/* Start screen */
+.field-label{display:block;text-align:left;font-size:12.5px;font-weight:600;color:#374151;margin:0 0 6px 2px}
+.field{
+  width:100%;padding:13px 15px;font-size:14px;border:1.5px solid var(--line);
+  border-radius:11px;margin-bottom:5px;background:#fff;outline:none;transition:.18s;
+}
+.field:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(46,92,217,.12);background:#fff}
+.field-gap{height:9px}
+.info-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:0 0 22px;padding:16px 6px;background:#F9FAFB;border-radius:16px;border:1px solid #F3F4F6}
+.info-card{display:flex;flex-direction:column;align-items:center;gap:5px;text-align:center}
+.info-card .ic-val{font-size:16px;font-weight:800;color:var(--navy-2);line-height:1}
+.info-card .ic-top{font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.02em}
+.note{font-size:11.5px;color:var(--muted);margin-top:14px;text-align:center;line-height:1.5}
+.err{color:var(--red);font-size:12px;font-weight:500;margin:0 0 10px 2px;text-align:left}
+
+#quizContainer,#resultContainer{display:none}
+
+/* Quiz */
+.quiz-header{background:var(--navy);padding:16px 20px;display:flex;align-items:center;justify-content:space-between}
+.quiz-header h2{font-size:14.5px;font-weight:700;color:#fff;margin:0 12px 0 0;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.quiz-pad{padding:24px 24px 40px;min-height:600px;box-sizing:border-box;display:flex;flex-direction:column}
+.top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.qcount{font-weight:600;color:#374151;font-size:12.5px;white-space:nowrap}
+.qprogress{font-weight:600;color:var(--blue);font-size:12.5px;white-space:nowrap}
+.timer{
+  display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:12.5px;
+  background:rgba(255,255,255,0.12);color:#fff;padding:6px 12px;border-radius:20px;border:none;
+}
+.timer.warn{background:var(--red);animation:pulse .8s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+.timer .ring{
+  --p:100;width:13px;height:13px;border-radius:50%;flex:0 0 auto;
+  background:conic-gradient(currentColor calc(var(--p)*1%),rgba(255,255,255,.28) 0);
+}
+.progress{height:5px;background:#E5E7EB;border-radius:4px;overflow:hidden;margin-bottom:18px}
+.progress-bar{height:100%;width:0%;background:var(--blue);border-radius:4px;transition:width .4s ease}
+.question{font-family:'Source Serif 4',serif;font-size:17px;line-height:1.45;margin-bottom:18px;color:var(--ink);font-weight:700}
+.option{
+  width:100%;text-align:left;margin-bottom:9px;padding:13px 15px;
+  border:1.5px solid var(--line);border-radius:12px;background:#fff;font-size:13.5px;
+  color:#374151;display:flex;align-items:center;gap:12px;position:relative;font-weight:500;
+}
+.option .marker{
+  width:26px;height:26px;border-radius:50%;background:transparent;color:#6B7280;
+  display:grid;place-items:center;font-weight:700;font-size:11.5px;flex:0 0 auto;border:1.5px solid #D1D5DB;
+}
+.option:hover:not(:disabled){border-color:#93C5FD}
+.option:disabled{cursor:default}
+.option.correct{background:#EFF6FF!important;color:var(--navy-2);border-color:var(--blue);font-weight:600}
+.option.correct .marker{background:var(--blue);color:#fff;border-color:var(--blue)}
+.option.wrong{background:var(--red-bg)!important;color:var(--red);border-color:var(--red);font-weight:600}
+.option.wrong .marker{background:var(--red);color:#fff;border-color:var(--red)}
+.explanation{
+  margin-top:8px;padding:14px 16px;background:#F9FAFB;border-left:4px solid var(--blue);
+  border-radius:8px;display:none;font-size:13px;line-height:1.55;color:#374151;
+  animation:fade .25s ease;
+}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.autonext{font-size:12px;color:var(--muted);margin-top:10px;text-align:right;display:none}
+
+/* Result */
+#resultContainer{text-align:left}
+.result-head{
+  background:linear-gradient(135deg,var(--navy-deep) 0%,#1a2a70 100%);color:#fff;
+  margin:-24px -26px 0;padding:26px 24px 28px;
+}
+.result-head .kicker{font-size:13.5px;font-weight:700;color:var(--gold-soft);margin:0 0 6px}
+.result-name{font-family:'Source Serif 4',serif;font-size:19px;color:#fff;margin:0 0 6px;font-weight:700;line-height:1.25;overflow-wrap:break-word}
+.result-head .sub{font-size:12.5px;color:rgba(255,255,255,.72);margin:0;line-height:1.4}
+
+.score-section{margin-top:18px;display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center;margin-bottom:18px}
+.score-ring{
+  --p:0;width:100px;height:100px;border-radius:50%;flex:0 0 auto;
+  background:conic-gradient(var(--green) calc(var(--p)*1%),#E5E7EB 0);
+  display:grid;place-items:center;transition:background 1s cubic-bezier(.4,0,.2,1);
+}
+.score-ring .inner{width:80px;height:80px;border-radius:50%;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.score-ring .pct{font-size:21px;font-weight:800;color:var(--ink);line-height:1}
+.score-ring .lbl{font-size:9px;color:var(--muted);font-weight:600;margin-top:2px}
+.stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.stat{
+  background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 6px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-align:center;
+  box-shadow:0 3px 10px rgba(0,0,0,.04);
+}
+.stat .n{font-size:16px;font-weight:800;color:var(--ink);line-height:1}
+.stat .t{font-size:9.5px;color:var(--muted)}
+
+.summary-card{
+  background:#fff;border:1px solid var(--line);border-radius:14px;
+  padding:2px 16px;margin-bottom:18px;box-shadow:0 3px 10px rgba(0,0,0,.04);
+}
+.summary-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid #F3F4F6}
+.summary-row:last-child{border-bottom:none}
+.summary-row .lbl{font-size:13px;color:var(--muted)}
+.summary-row .val{font-size:14px;font-weight:700;color:var(--ink)}
+
+.certificate-preview{
+  background:#fff;border:1px solid var(--line);border-radius:14px;
+  padding:16px;margin-bottom:18px;box-shadow:0 3px 10px rgba(0,0,0,.04);
+  display:flex;align-items:center;justify-content:center;min-height:170px;
+}
+.cert-preview-loading{display:flex;flex-direction:column;align-items:center;gap:10px;padding:22px 0}
+.cert-preview-loading p{font-size:12px;color:var(--muted);margin:0}
+.cert-preview-spinner{
+  width:24px;height:24px;border-radius:50%;border:3px solid #E5E7EB;border-top-color:var(--blue);
+  animation:certSpin .8s linear infinite;
+}
+@keyframes certSpin{to{transform:rotate(360deg)}}
+.cert-preview-image{width:100%;height:auto;border-radius:9px;display:block;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.cert-preview-fallback{font-size:12px;color:var(--muted);text-align:center;margin:0;padding:22px 10px}
+
+#submitStatus{margin:0 0 14px;font-weight:500;font-size:12px;line-height:1.5;color:var(--muted)}
+#submitStatus .status-note{display:block;font-weight:400;font-size:11.5px;color:var(--muted);margin-top:2px}
+#submitStatus.dup{color:#b5790c}
+#submitStatus.ok{color:var(--green)}
+#submitStatus.error{color:var(--red)}
+.email-status{font-weight:600;font-size:12.5px;color:var(--green);margin:-8px 0 14px}
+
+.bottom-actions-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.action-row{display:contents}
+.action-row .action-btn{display:none}
+.action-row.visible .action-btn{display:flex}
+.action-btn{
+  height:46px;border-radius:11px;font-size:13px;font-weight:700;align-items:center;justify-content:center;gap:6px;
+  border:none;background:linear-gradient(135deg,var(--blue) 0%,var(--blue-dark) 100%);color:#fff;box-shadow:0 6px 16px rgba(46,92,217,.24);
+}
+.action-btn:hover{transform:translateY(-2px)}
+.action-btn.secondary{background:#fff;color:var(--blue);border:1.5px solid #C7D2FE;box-shadow:none}
+
+.leaderboard-btn{
+  width:100%;height:46px;border-radius:11px;font-size:13px;font-weight:700;margin-bottom:20px;
+  border:1.5px solid #FDE68A;background:#FFFBEB;color:#B45309;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.leaderboard-btn:hover{transform:translateY(-2px)}
+
+.review-toggle-btn{
+  width:100%;height:46px;border-radius:11px;font-size:13px;font-weight:700;margin-bottom:4px;
+  border:1.5px solid #C7D2FE;background:#F5F7FF;color:var(--blue);
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.review-toggle-btn:hover{transform:translateY(-2px);background:#EEF2FF}
+
+.leaderboard-modal{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
+.leaderboard-backdrop{position:absolute;inset:0;background:rgba(11,20,50,.6);backdrop-filter:blur(2px)}
+.leaderboard-panel{
+  position:relative;background:#fff;border-radius:20px;max-width:400px;width:100%;max-height:80vh;
+  display:flex;flex-direction:column;padding:22px 22px 18px;box-shadow:0 24px 60px rgba(0,0,0,.3);
+  animation:leaderboardIn .2s ease;
+}
+@keyframes leaderboardIn{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+.leaderboard-header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.leaderboard-header h2{font-size:16px;font-weight:800;color:var(--navy-2);margin:0}
+.leaderboard-close{width:30px;height:30px;border-radius:50%;border:none;background:#F3F4F6;color:#374151;font-size:14px;flex:0 0 auto}
+.leaderboard-close:hover{background:#E5E7EB}
+.leaderboard-sub{font-size:12px;color:var(--muted);margin:4px 0 14px}
+.leaderboard-body{overflow-y:auto;flex:1;min-height:120px}
+.leaderboard-loading,.leaderboard-error{font-size:13px;color:var(--muted);text-align:center;padding:24px 0}
+.leaderboard-error{color:var(--red)}
+.leaderboard-row{display:grid;grid-template-columns:28px 1fr auto;gap:10px;align-items:center;padding:10px 8px;border-radius:10px;margin-bottom:6px;background:#F9FAFB}
+.leaderboard-row.top3{background:#FFFBEB}
+.leaderboard-rank{width:26px;height:26px;border-radius:50%;background:#E5E7EB;color:#374151;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800}
+.leaderboard-row.top3 .leaderboard-rank{background:var(--gold);color:#fff}
+.leaderboard-name{font-size:13px;font-weight:700;color:var(--ink);line-height:1.3}
+.leaderboard-email{font-size:11px;color:var(--muted);line-height:1.3}
+.leaderboard-score-col{text-align:right}
+.leaderboard-score{font-size:14px;font-weight:800;color:var(--blue)}
+.leaderboard-time{font-size:10.5px;color:var(--muted)}
+.leaderboard-updated{font-size:10.5px;color:var(--muted);text-align:center;margin:12px 0 0}
+
+.review-head{text-align:left;margin:0 0 4px;color:var(--navy-2);font-size:15px;border-top:1px solid var(--line);padding-top:18px;font-weight:700}
+.review-item{margin-top:10px;border:1px solid var(--line);border-left:4px solid var(--muted);border-radius:12px;background:#fff;cursor:pointer;overflow:hidden}
+.review-item.r-correct{border-left-color:var(--green)}
+.review-item.r-wrong{border-left-color:var(--red)}
+.review-item.r-skip{border-left-color:#b5790c}
+.review-item .review-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px}
+.review-item h4{font-size:13px;color:var(--ink);font-weight:600;line-height:1.4;margin:0}
+.review-item .detail{display:none;padding:0 14px 14px}
+.review-item.expanded .detail{display:block}
+.review-item p{font-size:12.5px;margin:3px 0;color:#42506a}
+.review-item .tag{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:999px;flex:0 0 auto}
+.tag.t-correct{background:var(--green-bg);color:var(--green)}
+.tag.t-wrong{background:var(--red-bg);color:var(--red)}
+.tag.t-skip{background:#fff4e0;color:#b5790c}
+
+@media(max-width:380px){
+  .brand-bar{padding:26px 20px 22px}
+  .brand-bar h1{font-size:22px}
+  .pad{padding:18px 18px 24px}
+  .quiz-pad{padding:18px 18px 32px;min-height:520px}
+}
+@media(min-width:640px){
+  body{padding:40px 20px}
+  .container{max-width:460px}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- ================= START SCREEN ================= -->
+<div id="startScreen">
+  <div class="brand-bar">
+    <div class="kicker">Welcome to</div>
+    <h1>Research Literacy Quiz</h1>
+    <p class="sub">A structured assessment of Equity Research, Financial Markets &amp; Capital Markets fundamentals.</p>
+  </div>
+  <div class="pad">
+    <div class="info-grid">
+      <div class="info-card"><div class="ic-val">20</div><div class="ic-top">Questions</div></div>
+      <div class="info-card"><div class="ic-val" id="estMinutes">5</div><div class="ic-top">Minutes</div></div>
+      <div class="info-card"><div class="ic-val">50%</div><div class="ic-top">Pass Score</div></div>
+      <div class="info-card"><div class="ic-val">Yes</div><div class="ic-top">Certificate</div></div>
+    </div>
+
+    <label class="field-label" for="candidateName">Full Name</label>
+    <input type="text" id="candidateName" class="field" placeholder="Enter your full name">
+    <p id="nameError" class="err" style="display:none;"></p>
+    <div class="field-gap"></div>
+
+    <label class="field-label" for="candidateEmail">Email ID</label>
+    <input type="email" id="candidateEmail" class="field" placeholder="you@example.com">
+    <p id="emailError" class="err" style="display:none;"></p>
+    <div class="field-gap"></div>
+
+    <label class="field-label" for="candidateInstitution">Institution Name</label>
+    <input type="text" id="candidateInstitution" class="field" placeholder="Enter your institution name">
+    <p id="institutionError" class="err" style="display:none;"></p>
+    <div class="field-gap"></div>
+
+    <label class="field-label" for="candidateCoupon">Coupon Code</label>
+    <input type="text" id="candidateCoupon" class="field" placeholder="If no coupon code, enter NA" style="text-transform:uppercase">
+    <p id="couponError" class="err" style="display:none;"></p>
+
+    <button id="startBtn" class="btn-primary">Start Quiz →</button>
+    <p class="note">Answer each question before the timer ends — the quiz moves on automatically. Good luck!</p>
+  </div>
+</div>
+
+<!-- ================= QUIZ ================= -->
+<div id="quizContainer">
+  <div class="quiz-header">
+    <h2>Research Literacy Quiz</h2>
+    <div class="timer" id="timerWrap">
+      <span class="ring" id="timerRing"></span>
+      <span id="timer">15</span>s
+    </div>
+  </div>
+  <div class="quiz-pad">
+    <div class="top-bar">
+      <div class="qcount" id="questionCount"></div>
+      <div class="qprogress" id="qProgressPct"></div>
+    </div>
+    <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+    <div class="question" id="questionText"></div>
+    <div id="optionsContainer"></div>
+    <div class="explanation" id="explanationBox"></div>
+    <div class="autonext" id="autoNext">Next question loading…</div>
+  </div>
+</div>
+
+<!-- ================= RESULT ================= -->
+<div id="resultContainer">
+  <div class="pad">
+    <header class="result-head">
+      <p class="kicker">Assessment Complete</p>
+      <h2 class="result-name" id="resultName"></h2>
+      <p class="sub">You have completed the Research Literacy Quiz</p>
+    </header>
+
+    <section class="score-section" aria-label="Your score">
+      <div class="score-ring" id="scoreRing" role="img" aria-label="Score percentage">
+        <div class="inner">
+          <div class="pct"><span id="percentage">0</span>%</div>
+          <div class="lbl">Your Score</div>
+        </div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat"><div class="n" id="correctScore">0</div><div class="t">Correct</div></div>
+        <div class="stat"><div class="n" id="wrongScore">0</div><div class="t">Wrong</div></div>
+        <div class="stat"><div class="n" id="skippedScore">0</div><div class="t">Skipped</div></div>
+        <div class="stat"><div class="n" id="totalQuestionsStat">0</div><div class="t">Total Questions</div></div>
+      </div>
+    </section>
+
+    <section class="certificate-preview" id="certificate-preview-section" aria-label="Your certificate">
+      <div id="certificatePreviewLoading" class="cert-preview-loading">
+        <div class="cert-preview-spinner"></div>
+        <p>Generating your certificate…</p>
+      </div>
+      <img id="certificatePreviewImage" class="cert-preview-image" style="display:none;" alt="Your certificate of participation" />
+      <p id="certificatePreviewFallback" class="cert-preview-fallback" style="display:none;">
+        Your certificate is ready — use the Download button below to view it.
+      </p>
+    </section>
+
+    <div id="submitStatus"></div>
+    <p id="emailStatus" class="email-status" style="display:none;">📧 Your certificate has been emailed successfully.</p>
+
+    <div class="bottom-actions-row" id="bottomActionsRow">
+      <div class="action-row" id="certActions">
+        <button class="action-btn" id="downloadCertBtn">⬇ Download</button>
+        <button class="action-btn secondary" id="linkedinShareBtn">Share on LinkedIn</button>
+      </div>
+    </div>
+    <button id="restartBtn" class="btn-ghost">Restart Quiz</button>
+    <button id="leaderboardBtn" class="leaderboard-btn" type="button">🏆 Live Leaderboard</button>
+
+    <button id="reviewToggleBtn" class="review-toggle-btn" type="button">📋 Show Answer Review</button>
+
+    <div id="reviewWrap" style="display:none;">
+      <h3 class="review-head" id="reviewHead">Answer Review</h3>
+      <div id="reviewSection"></div>
+    </div>
+  </div>
+</div>
+
+<div id="leaderboardModal" class="leaderboard-modal" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="leaderboardTitle">
+  <div class="leaderboard-backdrop" id="leaderboardBackdrop"></div>
+  <div class="leaderboard-panel">
+    <div class="leaderboard-header">
+      <h2 id="leaderboardTitle">🏆 Live Leaderboard</h2>
+      <button id="leaderboardCloseBtn" class="leaderboard-close" aria-label="Close leaderboard" type="button">✕</button>
+    </div>
+    <p class="leaderboard-sub">Top 10 · ranked by score, then fastest time</p>
+    <div id="leaderboardBody" class="leaderboard-body">
+      <p class="leaderboard-loading">Loading leaderboard…</p>
+    </div>
+    <p class="leaderboard-updated" id="leaderboardUpdated"></p>
+  </div>
+</div>
+
+</div>
+
+<script>
+const set1 = [
+{question:"Which market deals with newly issued securities?",options:["Secondary Market","Commodity Market","Primary Market","Forex Market"],answer:2,explanation:"New shares and bonds are issued in the primary market. Investors purchase these securities directly from the issuer."},
+{question:"Which market allows investors to buy and sell existing shares?",options:["Primary Market","Secondary Market","Bond Market","Money Market"],answer:1,explanation:"The secondary market facilitates trading among investors after securities have been issued. Stock exchanges are a part of the secondary market."},
+{question:"Who regulates the securities market in India?",options:["RBI","SEBI","NABARD","LIC"],answer:1,explanation:"SEBI regulates India's securities market and protects investors. It ensures transparency and fair market practices."},
+{question:"What does NSE stand for?",options:["National Stock Exchange","National Securities Enterprise","New Stock Economy","National Savings Exchange"],answer:0,explanation:"NSE is one of India's largest stock exchanges. It provides a platform for trading various securities."},
+{question:"Which of the following is an investor?",options:["A person who buys securities for potential returns","A company auditor","A tax collector","A stock exchange employee"],answer:0,explanation:"Investors allocate money into financial assets expecting future returns. They are key participants in capital markets."},
+{question:"Why do companies issue shares in the Primary Market?",options:["To pay electricity bills","To raise capital from investors","To reduce taxes","To increase stock prices"],answer:1,explanation:"Companies issue shares to raise funds for expansion, projects, or debt repayment. This allows them to access capital without borrowing from banks."},
+{question:"Which of the following is a function of the Secondary Market?",options:["Creating new shares","Facilitating liquidity for investors","Printing share certificates","Regulating banks"],answer:1,explanation:"The secondary market allows investors to buy and sell securities easily. This liquidity encourages participation in the primary market."},
+{question:"Which organization protects investor interests in India?",options:["SBI","RBI","SEBI","GST Council"],answer:2,explanation:"SEBI safeguards investors through regulations and market surveillance. It acts against unfair trade practices and fraud."},
+{question:"What is meant by market liquidity?",options:["Availability of cash in banks","Ease of buying and selling securities","Company profitability","Government spending"],answer:1,explanation:"Liquidity measures how quickly an asset can be converted into cash without significantly affecting its price. Highly liquid markets attract more investors."},
+{question:"Which participant typically helps companies issue securities?",options:["Merchant Banker","Retail Investor","Tax Consultant","Auditor"],answer:0,explanation:"Merchant bankers manage and advise companies during IPOs and other capital-raising activities. They help with pricing, compliance, and marketing."},
+{question:"Which of the following is a debt security?",options:["Equity Share","Mutual Fund","Bond","ETF"],answer:2,explanation:"A bond represents a loan made by investors to an issuer. Bondholders receive interest and repayment of principal."},
+{question:"What is the main benefit of a stock exchange listing?",options:["Increased visibility and easier trading","Reduced taxes","Guaranteed profits","Free capital"],answer:0,explanation:"Listing increases a company's visibility among investors and improves liquidity in its shares. It also provides easier access to future capital."},
+{question:"Which of the following is a major stock exchange in India?",options:["NSE","LIC","SBI","IRDAI"],answer:0,explanation:"NSE is a major stock exchange where shares, derivatives, and other securities are traded. The other organizations serve different functions in the financial system."},
+{question:"What happens during an IPO?",options:["Existing shares are cancelled","Company borrows money from banks","Company offers shares to the public for the first time","Government purchases company shares"],answer:2,explanation:"An IPO converts a private company into a publicly traded company. Investors can purchase shares and become part-owners of the business."},
+{question:"Which of the following can influence capital market performance?",options:["Interest Rates","Inflation","Economic Growth","All of the Above"],answer:3,explanation:"Economic factors affect company earnings, investor sentiment, and investment flows. Therefore, they significantly influence capital market performance."},
+{question:"A company issues shares to the public and raises ₹500 crore. This transaction takes place in:",options:["Secondary Market","Commodity Market","Primary Market","Forex Market"],answer:2,explanation:"Funds raised directly by the company through issuing securities occur in the primary market. The company receives the proceeds from the issue."},
+{question:"Which of the following best explains liquidity risk?",options:["Risk that a security cannot be sold quickly at a fair price","Risk of company bankruptcy","Risk of inflation rising","Risk of taxation changes"],answer:0,explanation:"Liquidity risk arises when there are insufficient buyers or sellers in the market. Investors may have to accept lower prices to sell quickly."},
+{question:"If an investor purchases shares from another investor through NSE, the company receives:",options:["Full sale proceeds","Partial proceeds","No proceeds","Dividend income"],answer:2,explanation:"In secondary market transactions, money changes hands between investors. The issuing company is not directly involved in these trades."},
+{question:"Which of the following is NOT a capital market instrument?",options:["Equity Shares","Corporate Bonds","Treasury Bills","Preference Shares"],answer:2,explanation:"Treasury Bills are short-term money market instruments, usually maturing within one year. Capital markets mainly deal with long-term securities."},
+{question:"Why is SEBI's role important in the capital market?",options:["To guarantee profits","To prevent fraud and ensure fair practices","To fix stock prices","To issue dividends"],answer:1,explanation:"SEBI promotes market integrity by enforcing regulations and monitoring market participants. This builds investor confidence and market stability."}
+];
+
+const set2 = [
+{question:"A company has Current Assets of ₹500 crore and Current Liabilities of ₹250 crore. What is its Current Ratio?",options:["1.0","1.5","2.0","2.5"],answer:2,explanation:"Current Ratio = 500 ÷ 250 = 2.0. This means the company has ₹2 of current assets for every ₹1 of current liabilities."},
+{question:"If a company's share price is ₹600 and EPS is ₹30, its P/E Ratio is:",options:["10","15","20","25"],answer:2,explanation:"P/E Ratio = Share Price ÷ EPS = 600 ÷ 30 = 20. Investors are paying ₹20 for every ₹1 of earnings."},
+{question:"ROE is calculated as:",options:["Net Profit ÷ Equity × 100","Revenue ÷ Assets × 100","Debt ÷ Equity × 100","Assets ÷ Revenue × 100"],answer:0,explanation:"ROE measures the return generated from shareholders' capital. It is expressed as a percentage for easier comparison."},
+{question:"Which ratio is most useful for evaluating short-term solvency?",options:["P/E Ratio","Current Ratio","ROE","ROCE"],answer:1,explanation:"Short-term solvency refers to the ability to meet immediate obligations. The Current Ratio directly measures this capability."},
+{question:"If Total Debt is ₹400 crore and Equity is ₹200 crore, the Debt-to-Equity Ratio is:",options:["0.5","1.0","1.5","2.0"],answer:3,explanation:"Debt-to-Equity Ratio = 400 ÷ 200 = 2.0. This means the company has twice as much debt as equity."},
+{question:"Which ratio helps investors understand market expectations about future growth?",options:["Current Ratio","Inventory Ratio","P/E Ratio","Debt Ratio"],answer:2,explanation:"Companies with high growth expectations often trade at higher P/E Ratios. Investors are willing to pay more for expected future earnings."},
+{question:"A company has Net Profit of ₹120 crore and Equity of ₹600 crore. ROE is:",options:["10%","15%","20%","25%"],answer:2,explanation:"ROE = (120 ÷ 600) × 100 = 20%. The company generates ₹20 of profit for every ₹100 invested by shareholders."},
+{question:"Which ratio would likely increase if debt rises while equity remains constant?",options:["Debt-to-Equity Ratio","Current Ratio","P/E Ratio","Asset Turnover Ratio"],answer:0,explanation:"Since equity remains unchanged, higher debt directly increases the Debt-to-Equity Ratio. This indicates greater financial leverage."},
+{question:"A very high Current Ratio may indicate:",options:["Efficient use of cash","Excess idle assets","High profits","Strong market share"],answer:1,explanation:"Extremely high liquidity can indicate unused cash or inefficient working capital management. Not all high ratios are necessarily positive."},
+{question:"Which ratio is most relevant for comparing banks?",options:["P/E Ratio","Current Ratio","Debt-to-Equity Ratio","ROE"],answer:3,explanation:"Banks operate with unique balance sheets where leverage is common. ROE is often used to assess how efficiently a bank generates profits from equity."},
+{question:"Company A has a P/E of 40 and Company B has a P/E of 15. Assuming similar industries, investors may expect:",options:["Higher future growth from Company A","Lower growth from Company A","Bankruptcy for Company A","Equal valuation"],answer:0,explanation:"A higher P/E often reflects stronger investor expectations for future earnings growth. However, it may also indicate overvaluation if growth does not materialize."},
+{question:"Two companies have identical profits. Company X has lower equity. Which company will likely have higher ROE?",options:["Company Y","Company X","Both same","Cannot determine"],answer:1,explanation:"ROE increases when the same profit is generated using a smaller equity base. This shows greater profitability relative to shareholder investment."},
+{question:"Which situation could artificially inflate ROE?",options:["Increase in equity","Share buybacks reducing equity base","Higher cash reserves","Lower revenue"],answer:1,explanation:"Share buybacks reduce shareholders' equity. This can increase ROE even if the company's actual profitability remains unchanged."},
+{question:"A company's Current Ratio falls from 2.5 to 1.2 over three years. This may indicate:",options:["Improving liquidity","Deteriorating short-term financial strength","Rising profitability","Falling share price"],answer:1,explanation:"A declining Current Ratio suggests the company has fewer liquid resources relative to its liabilities. Analysts may investigate whether liquidity is becoming a concern."},
+{question:"Which ratio is most likely to differ significantly between an IT company and a capital-intensive manufacturing company?",options:["ROE","Current Ratio","Debt-to-Equity Ratio","All of the above"],answer:3,explanation:"Different industries operate with different business models and capital requirements. Therefore, profitability, liquidity, and leverage ratios can vary significantly."},
+{question:"A company has Share Price = ₹900, EPS = ₹30, Industry P/E = 20. The company's P/E is:",options:["Undervalued relative to industry","Fairly valued","Overvalued relative to industry","Cannot determine"],answer:2,explanation:"The company's P/E is 900 ÷ 30 = 30, which is higher than the industry average of 20. Investors are paying a premium compared to similar companies."},
+{question:"Which ratio would be least useful when analyzing an early-stage startup with negligible profits?",options:["Current Ratio","Debt-to-Equity Ratio","P/E Ratio","Cash Ratio"],answer:2,explanation:"The P/E Ratio requires positive earnings to be meaningful. Startups often have little or no profit, making the ratio less useful."},
+{question:"Company A: ROE = 18%, D/E = 3.5; Company B: ROE = 16%, D/E = 0.5. Which company likely has a more conservative capital structure?",options:["Company A","Company B","Both same","Cannot determine"],answer:1,explanation:"A lower Debt-to-Equity Ratio generally indicates less reliance on borrowed funds. Company B is therefore using a more conservative financing approach."},
+{question:"A consistently rising P/E Ratio while earnings remain unchanged suggests:",options:["Falling investor confidence","Rising investor optimism about future growth","Increasing debt","Lower stock price"],answer:1,explanation:"If earnings stay constant but the stock price rises, the P/E Ratio increases. This usually reflects stronger market expectations about future performance."},
+{question:"An analyst should avoid relying on a single ratio because:",options:["Ratios are always inaccurate","Every ratio captures only one aspect of business performance","Financial statements are unnecessary","Market prices never change"],answer:1,explanation:"No single ratio provides a complete picture of a company's health. Analysts combine multiple ratios and qualitative factors to make informed decisions."}
+];
+
+const set3 = [
+{question:"What does \"asset allocation\" mean?",options:["Selecting a stock broker","Distributing investments among different asset classes","Paying taxes","Selling investments"],answer:1,explanation:"Asset allocation refers to dividing investments among asset classes such as equity, debt, and cash. It helps balance risk and return based on an investor's goals."},
+{question:"Which of the following is an equity investment?",options:["Fixed Deposit","Government Bond","Stock","Savings Account"],answer:2,explanation:"A stock represents ownership in a company and is therefore an equity investment. Investors benefit if the company's value and earnings grow over time."},
+{question:"Why do investors review their portfolios regularly?",options:["To monitor performance","To increase brokerage fees","To avoid receiving dividends","To close demat accounts"],answer:0,explanation:"Regular portfolio reviews help investors track performance and identify any changes needed. They ensure the portfolio remains aligned with financial objectives."},
+{question:"What is the benefit of investing in multiple sectors?",options:["Increased concentration risk","Reduced diversification","Lower sector-specific risk","Guaranteed profits"],answer:2,explanation:"Different sectors often perform differently under various economic conditions. Investing across sectors reduces the impact of a downturn in any one industry."},
+{question:"Which of the following is NOT an asset class?",options:["Equity","Debt","Real Estate","PAN Card"],answer:3,explanation:"A PAN Card is an identification document used for taxation purposes in India. It is not an investment or an asset class."},
+{question:"If 70% of a portfolio is invested in stocks and 30% in bonds, this represents:",options:["Market Timing","Asset Allocation","Day Trading","Arbitrage"],answer:1,explanation:"Asset allocation describes how investments are distributed among different asset classes. The 70:30 split shows the investor's chosen allocation strategy."},
+{question:"Which risk can diversification reduce?",options:["Market Risk","Inflation Risk","Company-Specific Risk","Interest Rate Risk"],answer:2,explanation:"Diversification helps reduce risks associated with a particular company or investment. However, it cannot completely eliminate market-wide risks."},
+{question:"A portfolio consisting of banking, IT, FMCG, and Pharma stocks is an example of:",options:["Sector Concentration","Diversification","Speculation","Arbitrage"],answer:1,explanation:"Investing across multiple sectors spreads risk. Weak performance in one sector may be offset by stronger performance in another."},
+{question:"Rebalancing a portfolio means:",options:["Closing all positions","Adjusting investments back to target allocation","Paying taxes","Taking loans"],answer:1,explanation:"Over time, asset values change and may alter the original allocation. Rebalancing restores the portfolio to its intended risk and return profile."},
+{question:"Which investor is likely to prefer a higher allocation to equities?",options:["Conservative Retiree","Risk-Averse Investor","Young Investor with Long-Term Goals","Fixed Deposit Investor"],answer:2,explanation:"Younger investors often have a longer investment horizon and can tolerate short-term market fluctuations. This allows them to seek higher growth through equities."},
+{question:"If a portfolio's value rises from ₹1,00,000 to ₹1,10,000, the return is:",options:["5%","10%","15%","20%"],answer:1,explanation:"The gain is ₹10,000 on an initial investment of ₹1,00,000. Dividing the gain by the original amount gives a 10% return."},
+{question:"Which metric measures portfolio performance?",options:["Return on Investment (ROI)","Employee Turnover","GST Rate","Repo Rate"],answer:0,explanation:"ROI measures the profit or loss generated relative to the amount invested. It is a commonly used indicator of portfolio performance."},
+{question:"Which investment objective generally requires a more conservative portfolio?",options:["Retirement next year","Wealth creation over 30 years","Aggressive growth","Venture investing"],answer:0,explanation:"Investors nearing their financial goals often prioritize capital preservation. Conservative portfolios help reduce the risk of significant losses."},
+{question:"Holding both equity and debt investments primarily helps:",options:["Increase concentration","Improve diversification","Avoid taxes","Guarantee profits"],answer:1,explanation:"Equity and debt assets often react differently to market conditions. Combining them can improve portfolio stability and diversification."},
+{question:"Which statement about portfolio risk is TRUE?",options:["Risk can be completely eliminated","Risk and return are unrelated","Higher potential returns often involve higher risk","Stocks are risk-free"],answer:2,explanation:"Investments offering higher returns generally come with greater uncertainty. Understanding this trade-off is essential for portfolio construction."},
+{question:"An investor allocates ₹60,000 to equity and ₹40,000 to debt. What is the equity allocation percentage?",options:["40%","50%","60%","70%"],answer:2,explanation:"The total portfolio value is ₹1,00,000. Equity allocation is ₹60,000 divided by ₹1,00,000, resulting in 60%."},
+{question:"A portfolio contains only technology stocks. What is its primary weakness?",options:["High diversification","Low liquidity","Sector Concentration Risk","Inflation Protection"],answer:2,explanation:"The portfolio's performance depends heavily on a single sector. Negative developments in technology could affect all holdings simultaneously."},
+{question:"A stock's weight in a portfolio increases from 10% to 25% due to price appreciation. What portfolio action may be considered?",options:["Speculation","Rebalancing","IPO Investing","Arbitrage"],answer:1,explanation:"The stock now occupies a much larger share of the portfolio than originally intended. Rebalancing can help restore the desired asset allocation."},
+{question:"Which portfolio is likely to have the highest volatility?",options:["100% Government Bonds","50% Bonds, 50% Stocks","100% Large-Cap Stocks","100% Small-Cap Stocks"],answer:3,explanation:"Small-cap stocks generally experience larger price fluctuations than large-cap stocks or bonds. Therefore, they tend to have higher volatility."},
+{question:"What is the main purpose of a benchmark such as the Nifty 50?",options:["Store investments","Measure portfolio performance against the market","Pay dividends","Issue bonds"],answer:1,explanation:"Benchmarks provide a standard for comparing portfolio returns. They help investors determine whether their investments are outperforming or underperforming the market."}
+];
+
+const set4 = [
+{question:"If revenue grows by 20% but profit grows by only 5%, what might this indicate?",options:["Costs have increased significantly","Revenue is fake","Debt is zero","Dividend doubled"],answer:0,explanation:"When profits grow slower than revenue, costs may be rising faster than sales. This can lead to pressure on profit margins."},
+{question:"What does YoY stand for in earnings analysis?",options:["Year over Year","Yield on Yield","Year of Yield","Yield over Year"],answer:0,explanation:"YoY compares performance with the same period in the previous year. It helps remove seasonal effects from financial analysis."},
+{question:"What does QoQ stand for?",options:["Quality of Quotations","Quarter over Quarter","Quantity of Quality","Quick on Quick"],answer:1,explanation:"QoQ compares one quarter's performance with the immediately preceding quarter. It helps identify short-term business trends."},
+{question:"Which of the following indicates operational efficiency?",options:["EBITDA Margin","Share Price","Face Value","Promoter Holding"],answer:0,explanation:"EBITDA Margin shows how much operating profit is generated from revenue. A higher margin generally indicates better operational efficiency."},
+{question:"A company reports revenue of ₹500 crore and expenses of ₹400 crore. Operating profit is:",options:["₹50 crore","₹100 crore","₹400 crore","₹900 crore"],answer:1,explanation:"Operating Profit is calculated by subtracting operating expenses from revenue. Here, ₹500 crore minus ₹400 crore equals ₹100 crore."},
+{question:"During earnings season, analysts often compare actual results against:",options:["Weather forecasts","Market expectations or estimates","Gold prices only","Government budgets only"],answer:1,explanation:"Markets often react based on whether results beat or miss expectations. A company can report profits and still disappoint investors if expectations were higher."},
+{question:"Which section of an earnings report often discusses future outlook?",options:["Auditor's Signature","Management Commentary","Share Certificate","Stock Exchange Listing"],answer:1,explanation:"Management Commentary provides insights into future plans, risks, and opportunities. Investors closely watch this section for guidance."},
+{question:"A rise in EBITDA margin generally suggests:",options:["Improved operational profitability","Reduced sales","Higher taxes","Lower cash balances"],answer:0,explanation:"A rising EBITDA margin means the company is generating more operating profit from each rupee of revenue. This often reflects better cost control."},
+{question:"What is an Earnings Call?",options:["Call made to shareholders for payment","Conference where management discusses results with analysts and investors","Loan approval process","Annual tax meeting"],answer:1,explanation:"Earnings Calls allow management to explain financial performance and answer analyst questions. They often provide valuable insights beyond the published results."},
+{question:"Why do stock prices sometimes fall even after profit growth?",options:["Results were below market expectations","Stock market closed","Company paid dividends","Revenue increased"],answer:0,explanation:"Markets are forward-looking and often focus on expectations rather than absolute numbers. Profit growth may still disappoint investors if growth was expected to be much higher."},
+{question:"Company A reports Revenue Growth = 15% and EBITDA Growth = 25%. What does this most likely indicate?",options:["Improving operating leverage","Declining sales efficiency","Increasing losses","Falling productivity"],answer:0,explanation:"EBITDA growing faster than revenue suggests costs are increasing at a slower pace than sales. This is a sign of positive operating leverage."},
+{question:"Which scenario would be most concerning for analysts?",options:["Revenue +10%, Profit +12%","Revenue +15%, Profit +20%","Revenue +12%, Profit -25%","Revenue +8%, Profit +10%"],answer:2,explanation:"Rising revenue with sharply falling profit may indicate severe cost pressures or operational issues. Analysts would investigate the reasons behind the profit decline."},
+{question:"A company beats revenue estimates but misses EPS estimates. This may suggest:",options:["Higher costs reduced profitability","Revenue declined","Shares were delisted","Debt became zero"],answer:0,explanation:"Strong revenue combined with weak EPS often means expenses increased unexpectedly. As a result, profits fail to keep pace with sales growth."},
+{question:"Why is management guidance important?",options:["It helps estimate future company performance","It determines GST rates","It fixes share prices","It replaces quarterly results"],answer:0,explanation:"Guidance provides management's expectations for future business performance. Investors use it to forecast future earnings and growth."},
+{question:"A company reports Revenue = ₹1,000 crore and EBITDA = ₹250 crore. EBITDA Margin equals:",options:["15%","20%","25%","30%"],answer:2,explanation:"EBITDA Margin = EBITDA ÷ Revenue × 100. Therefore, ₹250 crore ÷ ₹1,000 crore × 100 = 25%."},
+{question:"Which earnings trend is usually considered strongest?",options:["Rising revenue and rising margins","Falling revenue and rising debt","Flat revenue and declining profit","Rising debt and declining cash flow"],answer:0,explanation:"Growing revenue combined with improving margins indicates both business expansion and efficient cost management. This is generally viewed very positively by investors."},
+{question:"Analysts often adjust earnings for one-time gains because:",options:["They may not reflect sustainable business performance","They increase taxes","They reduce revenue","They affect face value"],answer:0,explanation:"One-time gains can temporarily inflate profits and give a misleading picture of performance. Analysts focus on recurring earnings to assess long-term profitability."},
+{question:"A company's EPS increases while net profit remains unchanged. One possible reason is:",options:["Reduction in number of outstanding shares through buybacks","Revenue declined","Debt doubled","Taxes increased"],answer:0,explanation:"When a company buys back shares, the number of shares outstanding decreases. This can increase EPS even if total profits remain the same."},
+{question:"Which metric best indicates whether profit growth is supported by actual cash generation?",options:["Cash Flow from Operations","Face Value","Market Capitalization","Dividend Yield"],answer:0,explanation:"Cash Flow from Operations shows the cash generated by the core business. Strong profits supported by strong operating cash flow are generally more reliable."},
+{question:"During an earnings call, management lowers future revenue guidance despite strong current results. Investors may react negatively because:",options:["Future growth expectations have weakened","The company reported profits","Taxes were paid","Revenue increased"],answer:0,explanation:"Investors value companies based on future earnings potential rather than past performance. Lower guidance may signal slower growth ahead, affecting valuation."}
+];
+
+const set5 = [
+{question:"A company reports 18% YoY revenue growth but only 4% YoY net profit growth. What is the most likely explanation?",options:["Operating costs increased significantly","Revenue was overstated","Debt was fully repaid","Shares were delisted"],answer:0,explanation:"When costs grow faster than revenue, profit growth lags behind top-line growth. This squeezes margins even as sales expand strongly."},
+{question:"Why do analysts compare a company's quarterly results with market expectations?",options:["Stock prices react to surprises, not just absolute performance","SEBI requires it","Companies must publish analyst estimates","It determines dividend payments"],answer:0,explanation:"Markets price in expected performance in advance. A result that beats or misses those expectations tends to move the stock more than the absolute numbers alone."},
+{question:"Which metric best measures a company's operating profitability before financing and accounting expenses?",options:["EPS","EBITDA","Net Worth","Book Value"],answer:1,explanation:"EBITDA strips out interest, tax, depreciation, and amortization. This isolates how profitable the core operations are, independent of financing and accounting choices."},
+{question:"A company reports higher revenue but lower operating margin. What does this indicate?",options:["Improved cost efficiency","Rising operating expenses","Lower depreciation","Increased dividend payout"],answer:1,explanation:"A falling operating margin despite higher revenue means costs are eating into profitability. Expenses are growing faster than sales are being converted into profit."},
+{question:"During an earnings call, investors pay the most attention to:",options:["Management's future guidance","Office location","Share certificate design","Auditor's signature"],answer:0,explanation:"Stock valuations are forward-looking, so guidance on future performance often matters more than the quarter just reported. It shapes expectations for coming quarters."},
+{question:"Which of the following is considered a positive earnings surprise?",options:["Actual EPS exceeds analyst estimates","Revenue declines","Profit becomes negative","Debt increases"],answer:0,explanation:"A positive earnings surprise occurs when reported results beat what analysts had forecast. This often triggers a favorable stock price reaction."},
+{question:"Which financial metric is commonly called the \"bottom line\"?",options:["Revenue","EBITDA","Net Profit","Gross Sales"],answer:2,explanation:"Net Profit sits at the bottom of the income statement after all expenses, interest, and taxes are deducted. That position gives it the nickname \"bottom line\"."},
+{question:"Why are YoY comparisons generally preferred over QoQ comparisons for seasonal businesses?",options:["They reduce seasonal distortions","They ignore profits","They eliminate taxes","They increase EPS"],answer:0,explanation:"Comparing the same quarter a year apart cancels out seasonal patterns like festive or holiday demand. This gives a cleaner picture of underlying growth."},
+{question:"A company beats revenue estimates but misses EBITDA estimates. This most likely suggests:",options:["Higher operating costs","Lower taxes","Lower debt","Share buybacks"],answer:0,explanation:"Beating on revenue but missing on EBITDA points to costs rising faster than sales. The extra revenue isn't translating into proportionate operating profit."},
+{question:"Which statement is most likely to improve investor confidence?",options:["Strong earnings with improved future guidance","Falling revenue with optimistic advertisements","Higher debt with lower profits","Declining cash flow"],answer:0,explanation:"Strong current performance combined with a positive outlook reassures investors on both fronts. It signals the business is healthy now and expected to stay that way."},
+{question:"EBITDA Margin is calculated as:",options:["EBITDA ÷ Revenue × 100","Net Profit ÷ Assets","Revenue ÷ EBITDA","Revenue ÷ Debt"],answer:0,explanation:"EBITDA Margin expresses EBITDA as a percentage of revenue. It shows how much of every rupee of sales is retained as core operating profit."},
+{question:"Which scenario indicates improving operating leverage?",options:["EBITDA grows faster than revenue","Revenue grows faster than EBITDA","Revenue declines","Profit declines despite lower costs"],answer:0,explanation:"Operating leverage improves when profit grows disproportionately faster than revenue. This typically happens as fixed costs are spread over a larger sales base."},
+{question:"A company's EPS rises while revenue remains unchanged. Which event could explain this?",options:["Share buyback","New factory","Higher inventory","Increased GST"],answer:0,explanation:"A share buyback reduces the number of outstanding shares. With the same total profit divided among fewer shares, EPS rises even without revenue growth."},
+{question:"Which metric is least useful in evaluating quarterly profitability?",options:["EBITDA Margin","Net Profit Margin","Face Value","Operating Profit"],answer:2,explanation:"Face Value is an arbitrary accounting figure set at share issuance and has no bearing on a company's actual quarterly profitability. It plays no role in performance analysis."},
+{question:"Analysts often remove one-time gains because they:",options:["Distort recurring earnings","Increase dividends","Reduce taxes","Increase revenue"],answer:0,explanation:"One-time gains, like an asset sale, don't reflect the ongoing earning power of the business. Excluding them gives a clearer view of sustainable, recurring profitability."},
+{question:"If revenue grows 12% while operating expenses grow 25%, investors would likely expect:",options:["Margin pressure","Margin expansion","Lower debt","Higher dividends"],answer:0,explanation:"When expenses grow at roughly double the rate of revenue, profitability as a share of sales typically shrinks. This signals margin pressure ahead."},
+{question:"Which metric is most useful for comparing companies of different sizes?",options:["EBITDA Margin","Revenue","Total Assets","Market Cap"],answer:0,explanation:"EBITDA Margin is a percentage, making it size-independent and comparable across companies regardless of their absolute revenue or asset base."},
+{question:"Why might a stock decline despite record quarterly profits?",options:["Results failed to meet expectations","Revenue increased","Taxes decreased","Cash balance increased"],answer:0,explanation:"Even record profits can disappoint if the market had priced in even higher expectations. Stock reactions are driven by results relative to forecasts, not just absolute records."},
+{question:"Cash Flow from Operations is important because it shows:",options:["Whether profits are backed by cash generation","Share price movement","Dividend announcements","Market capitalization"],answer:0,explanation:"Operating cash flow reveals whether reported accounting profit is actually being converted into real cash. It's a check on the quality of reported earnings."},
+{question:"Which combination is strongest from an investor's perspective?",options:["Rising revenue, rising margins, positive guidance","Rising debt, falling profits","Flat revenue, declining cash flow","Lower margins, higher expenses"],answer:0,explanation:"Growing revenue alongside expanding margins and an optimistic outlook covers growth, profitability, and future potential together, making it the strongest combination."}
+];
+
+const set6 = [
+{question:"Which measure is most likely to influence a company's stock price immediately after quarterly results?",options:["Comparison between actual results and analyst expectations","Office expansion","Number of employees","Company logo"],answer:0,explanation:"Stocks tend to react to how results compare with what was already expected by the market. A beat or miss against those expectations drives the immediate price move."},
+{question:"A company reports strong revenue growth but declining EPS. What is the most likely reason?",options:["Costs or share count increased","Sales declined","Debt disappeared","Cash flow doubled"],answer:0,explanation:"Even with rising revenue, EPS can fall if operating costs eat into profit or if more shares are outstanding, diluting earnings per share."},
+{question:"Which metric best reflects a company's core operating performance?",options:["EBITDA","Dividend Yield","Book Value","Face Value"],answer:0,explanation:"EBITDA focuses purely on operating results, excluding financing costs, taxes, and non-cash accounting items, making it a clean measure of core performance."},
+{question:"A higher EBITDA margin generally indicates:",options:["Better operating efficiency","Higher taxes","Lower sales","Poor cash flow"],answer:0,explanation:"A higher EBITDA margin means a larger share of revenue is being converted into operating profit, reflecting more efficient cost management."},
+{question:"Which section of an earnings release discusses business outlook and risks?",options:["Management Commentary","Share Register","Balance Sheet Notes","Auditor's Seal"],answer:0,explanation:"Management commentary is where leadership discusses performance drivers, outlook, and risks. It's often the most closely read section by analysts."},
+{question:"Analysts often focus on recurring profits because they:",options:["Better represent sustainable earnings","Increase stock prices","Eliminate taxes","Ignore cash flow"],answer:0,explanation:"Recurring profits exclude one-off items, giving a more accurate picture of what the business can reliably earn quarter after quarter."},
+{question:"QoQ growth compares:",options:["Consecutive quarters","Consecutive years","Two industries","Two companies"],answer:0,explanation:"Quarter-on-quarter growth measures the change between one quarter and the immediately preceding quarter, useful for spotting short-term momentum."},
+{question:"Which situation is generally viewed most positively?",options:["Revenue growth accompanied by expanding margins","Revenue growth with falling margins","Profit decline despite higher sales","Falling revenue with higher debt"],answer:0,explanation:"Growing revenue alongside expanding margins shows the business is both growing and becoming more profitable at the same time, a strong combination."},
+{question:"What is a common reason for an earnings miss despite higher revenue?",options:["Rising operating expenses","Lower depreciation","Reduced taxes","Share buybacks"],answer:0,explanation:"If operating expenses rise faster than revenue, profit can miss expectations even though the top line grew, since costs erode the incremental sales."},
+{question:"Which metric is most useful for evaluating operational profitability?",options:["Operating Margin","Dividend Yield","Market Capitalization","Promoter Holding"],answer:0,explanation:"Operating Margin measures profit generated from core business operations as a percentage of revenue, directly reflecting operational profitability."},
+{question:"Investors usually react negatively when:",options:["Future guidance is reduced","Revenue grows","Margins improve","Cash flow increases"],answer:0,explanation:"Lower guidance signals weaker expected performance ahead, which can outweigh strong current results in the eyes of forward-looking investors."},
+{question:"Which of the following is NOT normally included in quarterly earnings analysis?",options:["Weather forecast","Revenue Growth","EPS","EBITDA"],answer:0,explanation:"Weather forecasts have no direct bearing on financial performance metrics and are not part of standard quarterly earnings analysis."},
+{question:"What does margin expansion indicate?",options:["Improved profitability per rupee of revenue","Lower revenue","Higher debt","Reduced assets"],answer:0,explanation:"Margin expansion means the company is retaining more profit from each rupee of sales, reflecting improved efficiency or pricing power."},
+{question:"Why do analysts study conference call transcripts?",options:["To understand management's confidence and future plans","To verify taxes","To calculate EPS","To determine share price"],answer:0,explanation:"Transcripts capture management's tone, answers to tough questions, and forward-looking commentary, offering insight beyond the raw numbers."},
+{question:"A company consistently beats analyst estimates over several quarters. This generally suggests:",options:["Strong execution and performance","Weak management","Poor accounting","Lower revenue"],answer:0,explanation:"A consistent pattern of beating estimates typically reflects strong operational execution and reliable forecasting discipline by the company."},
+{question:"Which trend is most concerning?",options:["Revenue growth slowing while expenses accelerate","Revenue and profit growing together","Stable EBITDA margins","Positive operating cash flow"],answer:0,explanation:"Slowing revenue combined with accelerating expenses is a warning sign, since it points toward shrinking margins and profitability pressure ahead."},
+{question:"Which metric helps determine whether reported profits are supported by cash?",options:["Cash Flow from Operations","Face Value","Dividend Yield","Book Value"],answer:0,explanation:"Cash Flow from Operations shows whether accounting profits are actually backed by real cash generated from the business, a key earnings quality check."},
+{question:"A company reports higher profits mainly because of selling a building. Analysts are likely to:",options:["Treat the gain as non-recurring","Increase future revenue forecasts","Ignore the transaction","Raise EBITDA automatically"],answer:0,explanation:"A one-off asset sale doesn't reflect ongoing business performance, so analysts typically strip it out when assessing sustainable earnings."},
+{question:"Which factor is most likely to improve investor confidence after an earnings announcement?",options:["Strong results combined with higher future guidance","Rising debt","Lower margins","Declining cash flow"],answer:0,explanation:"Strong current results paired with improved guidance reassures investors that good performance is expected to continue, not just a one-off quarter."},
+{question:"The primary objective of quarterly earnings analysis is to:",options:["Evaluate a company's financial performance and future prospects","Predict interest rates","Calculate GST","Decide stock exchange timings"],answer:0,explanation:"Quarterly earnings analysis exists to assess how a company performed and what that implies for its future prospects, informing investment decisions."}
+];
+let selectedSet = "";
+
+let currentQuestion=0,
+correct=0,
+wrong=0,
+skipped=0,
+timeLeft=15,
+timer,
+startTime,
+review=[],
+candidateName="",
+candidateEmail="",
+candidateInstitution="",
+candidateCoupon="",
+isNoCouponAttempt=false,
+quizResult={};
+
+let submissionStarted=false;
+let reviewExpandedIdx=-1;
+
+const QUESTION_TIME=15;
+
+(function updateEstimatedMinutes(){
+  const totalSeconds = QUESTION_TIME * set1.length;
+  const minutesEl = document.getElementById("estMinutes");
+  if (minutesEl) minutesEl.textContent = Math.round(totalSeconds / 60);
+})();
+
+function shuffle(arr){return [...arr].sort(()=>Math.random()-0.5);}
+
+const startBtn=document.getElementById("startBtn");
+startBtn.onclick=()=>{
+const name=document.getElementById("candidateName").value.trim();
+const email=document.getElementById("candidateEmail").value.trim();
+const institution=document.getElementById("candidateInstitution").value.trim();
+const coupon=document.getElementById("candidateCoupon").value.trim().toUpperCase();
+const nameErr=document.getElementById("nameError");
+const emailErr=document.getElementById("emailError");
+const institutionErr=document.getElementById("institutionError");
+const couponErr=document.getElementById("couponError");
+const emailOk=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+let valid=true;
+
+nameErr.style.display="none";
+emailErr.style.display="none";
+institutionErr.style.display="none";
+couponErr.style.display="none";
+
+if(name===""){
+nameErr.style.display="block";
+nameErr.textContent="Full name is required.";
+valid=false;
+}else if(name.length<3){
+nameErr.style.display="block";
+nameErr.textContent="Full name must be at least 3 characters.";
+valid=false;
+}else if(name.length>80){
+nameErr.style.display="block";
+nameErr.textContent="Full name must be at most 80 characters.";
+valid=false;
+}
+
+if(email===""){
+emailErr.style.display="block";
+emailErr.textContent="Email ID is required.";
+valid=false;
+}else if(!emailOk){
+emailErr.style.display="block";
+emailErr.textContent="Please enter a valid email ID.";
+valid=false;
+}
+
+if(institution===""){
+institutionErr.style.display="block";
+institutionErr.textContent="Institution name is required.";
+valid=false;
+}else if(institution.length<2){
+institutionErr.style.display="block";
+institutionErr.textContent="Institution name must be at least 2 characters.";
+valid=false;
+}else if(institution.length>120){
+institutionErr.style.display="block";
+institutionErr.textContent="Institution name must be at most 120 characters.";
+valid=false;
+}
+
+if(coupon===""){
+couponErr.style.display="block";
+couponErr.textContent="Coupon code is required.";
+valid=false;
+}
+
+if(!valid)return;
+
+candidateName=name;
+candidateEmail=email;
+candidateInstitution=institution;
+candidateCoupon=coupon;
+
+const questionSets=[set1,set2,set3,set4,set5,set6];
+isNoCouponAttempt = candidateCoupon==="NA";
+
+if(isNoCouponAttempt){
+  // No coupon: pool all 6 sets together and take 10 random questions.
+  // Not eligible for a certificate (handled at results time).
+  const allQuestions=questionSets.flat();
+  questions=shuffle(allQuestions).slice(0,10);
+  selectedSet="pooled-na";
+}else{
+  const randomIndex=Math.floor(Math.random()*questionSets.length);
+  questions=shuffle(questionSets[randomIndex]);
+  selectedSet=randomIndex;
+}
+
+startTime=new Date();
+enableRefreshProtection();
+document.getElementById("startScreen").style.display="none";
+document.getElementById("quizContainer").style.display="block";
+loadQuestion();
+};
+
+function beforeUnloadHandler(e){
+e.preventDefault();
+e.returnValue="Your assessment is in progress. Refreshing may lose your attempt.";
+return e.returnValue;
+}
+function enableRefreshProtection(){
+window.addEventListener("beforeunload",beforeUnloadHandler);
+}
+function disableRefreshProtection(){
+window.removeEventListener("beforeunload",beforeUnloadHandler);
+}
+
+function loadQuestion(){
+if(currentQuestion>=questions.length)return finishQuiz();
+clearInterval(timer);
+timeLeft=QUESTION_TIME;
+updateTimerUI();
+const q=questions[currentQuestion];
+document.getElementById("questionCount").textContent=`Question ${currentQuestion+1} of ${questions.length}`;
+document.getElementById("progressBar").style.width=((currentQuestion+1)/questions.length*100)+"%";
+document.getElementById("qProgressPct").textContent=`${Math.round((currentQuestion+1)/questions.length*100)}%`;
+document.getElementById("questionText").textContent=q.question;
+document.getElementById("explanationBox").style.display="none";
+document.getElementById("autoNext").style.display="none";
+
+const letters=["A","B","C","D","E","F"];
+const opts=q.options.map((o,i)=>({o,i}));
+shuffle(opts);
+const c=document.getElementById("optionsContainer");
+c.innerHTML="";
+opts.forEach((item,idx)=>{
+const b=document.createElement("button");
+b.className="option";
+b.innerHTML=`<span class="marker">${letters[idx]}</span><span>${item.o}</span>`;
+b.dataset.idx=item.i;
+b.onclick=()=>checkAnswer(item.i);
+c.appendChild(b);
+});
+
+timer=setInterval(()=>{
+timeLeft--;
+updateTimerUI();
+if(timeLeft<=0){
+clearInterval(timer);
+skipped++;
+review.push({q:q.question,user:"Skipped",correct:q.options[q.answer],exp:q.explanation,result:"skip"});
+goNext();
+}
+},1000);
+}
+
+function updateTimerUI(){
+document.getElementById("timer").textContent=timeLeft;
+const ring=document.getElementById("timerRing");
+const wrap=document.getElementById("timerWrap");
+const pct=Math.max(0,(timeLeft/QUESTION_TIME)*100);
+ring.style.setProperty("--p",pct);
+if(timeLeft<=5){wrap.classList.add("warn");}else{wrap.classList.remove("warn");}
+}
+
+function goNext(){
+currentQuestion++;
+loadQuestion();
+}
+
+function checkAnswer(selected){
+clearInterval(timer);
+const q=questions[currentQuestion];
+const buttons=document.querySelectorAll(".option");
+buttons.forEach(btn=>btn.disabled=true);
+
+const isCorrect=selected===q.answer;
+if(isCorrect){correct++;}else{wrong++;}
+
+buttons.forEach(btn=>{
+const i=Number(btn.dataset.idx);
+if(i===q.answer) btn.classList.add("correct");
+});
+if(!isCorrect){
+buttons.forEach(btn=>{
+if(Number(btn.dataset.idx)===selected) btn.classList.add("wrong");
+});
+}
+
+review.push({q:q.question,user:q.options[selected],correct:q.options[q.answer],exp:q.explanation,result:isCorrect?"correct":"wrong"});
+const exp=document.getElementById("explanationBox");
+exp.style.display="block";
+exp.innerHTML="<strong>"+(isCorrect?"✅ Correct!":"❌ Incorrect")+"</strong><br>"+q.explanation;
+
+const an=document.getElementById("autoNext");
+an.style.display="block";
+let cd=isCorrect?2:3;
+an.textContent=`Next question in ${cd}s…`;
+const cdTimer=setInterval(()=>{
+cd--;
+if(cd<=0){clearInterval(cdTimer);goNext();}
+else{an.textContent=`Next question in ${cd}s…`;}
+},1000);
+}
+
+function finishQuiz(){
+clearInterval(timer);
+disableRefreshProtection();
+document.getElementById("quizContainer").style.display="none";
+document.getElementById("resultContainer").style.display="block";
+document.getElementById("resultName").textContent=candidateName;
+const total=Math.floor((new Date()-startTime)/1000);
+const pct=(correct/questions.length)*100;
+const timeStr=Math.floor(total/60)+" min "+(total%60)+" sec";
+
+quizResult = {
+    name: candidateName,
+    email: candidateEmail,
+    institution: candidateInstitution,
+    coupon: candidateCoupon,
+    correct: correct,
+    wrong: wrong,
+    skipped: skipped,
+    score: correct,
+    percentage: pct.toFixed(2),
+    timeTaken: timeStr,
+    answers: review
+};
+
+document.getElementById("correctScore").textContent=correct;
+document.getElementById("wrongScore").textContent=wrong;
+document.getElementById("skippedScore").textContent=skipped;
+document.getElementById("totalQuestionsStat").textContent=questions.length;
+
+const ring=document.getElementById("scoreRing");
+const pctEl=document.getElementById("percentage");
+let cur=0;const target=Math.round(pct);
+const anim=setInterval(()=>{
+cur++;
+if(cur>=target){cur=target;clearInterval(anim);}
+ring.style.setProperty("--p",cur);
+pctEl.textContent=cur;
+},Math.max(12,Math.floor(900/(target||1))));
+
+renderReview();
+
+if(isNoCouponAttempt){
+  // No coupon entered: not eligible for a certificate, and the attempt
+  // is not saved to the backend at all (no sheet row, no leaderboard entry).
+  document.getElementById("certificate-preview-section").style.display="none";
+  document.getElementById("bottomActionsRow").style.display="none";
+  document.getElementById("submitStatus").innerHTML=
+    '<span class="status-note">Practice attempt (no coupon code) — results are not saved and no certificate is issued.</span>';
+}else{
+  submitResult();
+}
+}
+
+function renderReview(){
+let html="";
+review.forEach((r,i)=>{
+const cls=r.result==="correct"?"r-correct":r.result==="wrong"?"r-wrong":"r-skip";
+const tag=r.result==="correct"?'<span class="tag t-correct">Correct</span>':r.result==="wrong"?'<span class="tag t-wrong">Wrong</span>':'<span class="tag t-skip">Skipped</span>';
+const expanded=reviewExpandedIdx===i?"expanded":"";
+html+=`<div class='review-item ${cls} ${expanded}' data-idx="${i}">
+  <div class="review-row"><h4>${r.q}</h4>${tag}</div>
+  <div class="detail"><p><b>Your Answer:</b> ${r.user}</p><p><b>Correct Answer:</b> ${r.correct}</p><p><b>Explanation:</b> ${r.exp}</p></div>
+</div>`;
+});
+const section=document.getElementById("reviewSection");
+section.innerHTML=html;
+section.querySelectorAll(".review-item").forEach(el=>{
+el.onclick=()=>{
+const idx=Number(el.dataset.idx);
+reviewExpandedIdx = reviewExpandedIdx===idx ? -1 : idx;
+renderReview();
+};
+});
+}
+
+document.getElementById("restartBtn").onclick=()=>location.reload();
+
+// ---------------------------------------------------------------
+// Live Leaderboard
+// ---------------------------------------------------------------
+let leaderboardInterval=null;
+
+function openLeaderboard(){
+  const modal=document.getElementById("leaderboardModal");
+  modal.style.display="flex";
+  fetchLeaderboard();
+  if(leaderboardInterval) clearInterval(leaderboardInterval);
+  leaderboardInterval=setInterval(fetchLeaderboard,15000);
+}
+
+function closeLeaderboard(){
+  const modal=document.getElementById("leaderboardModal");
+  modal.style.display="none";
+  if(leaderboardInterval){
+    clearInterval(leaderboardInterval);
+    leaderboardInterval=null;
+  }
+}
+
+async function fetchLeaderboard(){
+  const body=document.getElementById("leaderboardBody");
+  const updated=document.getElementById("leaderboardUpdated");
+  try{
+    const res=await fetch("/.netlify/functions/leaderboard");
+    const data=await res.json();
+
+    if(!res.ok || !data.success){
+      body.innerHTML='<p class="leaderboard-error">Could not load the leaderboard. Please try again.</p>';
+      return;
+    }
+
+    if(!data.leaderboard || data.leaderboard.length===0){
+      body.innerHTML='<p class="leaderboard-loading">No results yet. Be the first!</p>';
+      updated.textContent="";
+      return;
+    }
+
+    let html="";
+    data.leaderboard.forEach((entry)=>{
+      const top3=entry.rank<=3?" top3":"";
+      html+=`<div class="leaderboard-row${top3}">
+        <div class="leaderboard-rank">${entry.rank}</div>
+        <div>
+          <div class="leaderboard-name">${escapeHtml(entry.name)}</div>
+          <div class="leaderboard-email">${escapeHtml(entry.email)}</div>
+        </div>
+        <div class="leaderboard-score-col">
+          <div class="leaderboard-score">${entry.score}</div>
+          <div class="leaderboard-time">${escapeHtml(entry.timeTaken||"")}</div>
+        </div>
+      </div>`;
+    });
+    body.innerHTML=html;
+
+    const t=new Date(data.updatedAt);
+    updated.textContent="Updated "+t.toLocaleTimeString();
+
+  }catch(err){
+    body.innerHTML='<p class="leaderboard-error">Could not load the leaderboard. Please try again.</p>';
+    console.error(err);
+  }
+}
+
+function escapeHtml(str){
+  const div=document.createElement("div");
+  div.textContent=str==null?"":String(str);
+  return div.innerHTML;
+}
+
+document.getElementById("leaderboardBtn").onclick=openLeaderboard;
+
+document.getElementById("reviewToggleBtn").onclick=()=>{
+  const wrap=document.getElementById("reviewWrap");
+  const btn=document.getElementById("reviewToggleBtn");
+  const isHidden=wrap.style.display==="none";
+  wrap.style.display=isHidden?"block":"none";
+  btn.textContent=isHidden?"📋 Hide Answer Review":"📋 Show Answer Review";
+  if(isHidden){
+    wrap.scrollIntoView({behavior:"smooth",block:"start"});
+  }
+};
+document.getElementById("leaderboardCloseBtn").onclick=closeLeaderboard;
+document.getElementById("leaderboardBackdrop").onclick=closeLeaderboard;
+document.addEventListener("keydown",(e)=>{
+  if(e.key==="Escape"){
+    const modal=document.getElementById("leaderboardModal");
+    if(modal.style.display==="flex") closeLeaderboard();
+  }
+});
+async function submitResult(){
+
+    if(submissionStarted) return;
+    submissionStarted=true;
+
+    const status=document.getElementById("submitStatus");
+    status.className="";
+    status.innerHTML='Submitting your result…<span class="status-note">Please wait.</span>';
+
+    try{
+
+        const response=await fetch("/.netlify/functions/submit",{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify(quizResult)
+        });
+
+        const result=await response.json();
+
+        if(response.status===409 || result.duplicate){
+
+            status.className="dup";
+            status.innerHTML='This email has already attempted this assessment.<span class="status-note">Only one attempt is allowed. Your result has not been saved.</span>';
+            showCertificatePreview(null);
+
+        }else if(response.ok && result.success){
+
+            status.className="ok";
+            status.innerHTML="Result submitted successfully.";
+
+            const emailStatus=document.getElementById("emailStatus");
+
+            if(result.emailed){
+                emailStatus.style.display="block";
+            }else if(result.certificateGenerated){
+                status.className="ok";
+                status.innerHTML='Result saved successfully.<span class="status-note">Download the certificate below.</span>';
+            }else{
+                status.className="ok";
+                status.innerHTML='Result saved successfully.<span class="status-note">Certificate generation failed.</span>';
+            }
+
+            if(result.certificateGenerated && result.certificateBase64){
+                setupCertificateActions(result.certificateBase64);
+            }
+
+            showCertificatePreview(result.certificateImageBase64);
+
+        }else{
+
+            status.className="error";
+            status.innerHTML='Submission failed.<span class="status-note">Please refresh and try again.</span>';
+            showCertificatePreview(null);
+
+        }
+
+    }catch(err){
+
+        status.className="error";
+        status.innerHTML='Submission failed.<span class="status-note">Please refresh and try again.</span>';
+        showCertificatePreview(null);
+        console.error(err);
+
+    }
+
+}
+
+/**
+ * Shows the certificate image preview if a base64 PNG was returned by the
+ * backend; otherwise falls back to a short message pointing at the
+ * Download button instead (rather than leaving a spinner running forever
+ * or showing a broken image).
+ */
+function showCertificatePreview(imageBase64){
+    const loading=document.getElementById("certificatePreviewLoading");
+    const img=document.getElementById("certificatePreviewImage");
+    const fallback=document.getElementById("certificatePreviewFallback");
+
+    loading.style.display="none";
+
+    if(imageBase64){
+        img.src="data:image/png;base64,"+imageBase64;
+        img.style.display="block";
+        fallback.style.display="none";
+    }else{
+        img.style.display="none";
+        fallback.style.display="block";
+    }
+}
+
+const LINKEDIN_SHARE_URL="https://research360.in";
+const LINKEDIN_SHARE_TEXT=
+    "I successfully completed the Research 360 Equity Research Assessment and received my Participation Certificate. "+
+    "Looking forward to continuing my learning journey in Finance and Equity Research. "+
+    "#EquityResearch #Finance #Research360";
+
+function base64ToBlob(base64,type){
+    const bytes=atob(base64);
+    const arr=new Uint8Array(bytes.length);
+    for(let i=0;i<bytes.length;i++){arr[i]=bytes.charCodeAt(i);}
+    return new Blob([arr],{type});
+}
+
+function setupCertificateActions(certificateBase64){
+    const actions=document.getElementById("certActions");
+    actions.classList.add("visible");
+
+    const pdfBlob=base64ToBlob(certificateBase64,"application/pdf");
+    const pdfUrl=URL.createObjectURL(pdfBlob);
+
+    document.getElementById("downloadCertBtn").onclick=()=>{
+        const a=document.createElement("a");
+        a.href=pdfUrl;
+        a.download="Research360-Certificate.pdf";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    };
+
+    document.getElementById("linkedinShareBtn").onclick=()=>{
+        const shareUrl=
+            "https://www.linkedin.com/sharing/share-offsite/?url="+
+            encodeURIComponent(LINKEDIN_SHARE_URL)+
+            "&text="+encodeURIComponent(LINKEDIN_SHARE_TEXT);
+        window.open(shareUrl,"_blank","noopener");
+    };
+}
+</script>
+</body>
+</html>
