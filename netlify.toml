@@ -4,6 +4,7 @@
 
 [functions]
   node_bundler = "esbuild"
+  external_node_modules = ["mupdf"]
   included_files = [
     "netlify/functions/assets/**",
     "netlify/functions/helpers/certificate-template.png",
